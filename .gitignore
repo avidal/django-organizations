@@ -1,0 +1,19 @@
+# Python files
+*.py[co]
+
+# Backup files
+*.sw[po]
+*~
+*.orig
+*.bak
+
+# OS Cruft
+.DS_Store
+Thumbs.db
+
+# Installer logs
+pip-log.txt
+
+# Unit text / coverage reports
+.coverage
+.tox
