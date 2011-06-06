@@ -14,6 +14,9 @@ Thumbs.db
 # Installer logs
 pip-log.txt
 
+# Development files
+*.db
+
 # Unit text / coverage reports
 .coverage
 .tox
