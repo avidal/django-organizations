@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(PROJECT_ROOT, '..')))
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-INTERNAL_IPS = ('127.0.0.1',)
+INTERNAL_IPS = ('127.0.0.1', '10.0.2.2')
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -94,7 +94,6 @@ SECRET_KEY = '%!-orr&*-8-xq!#$i=oljg7fwwq3%&2#u7j$e++k+#nt15%xrm'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -103,6 +102,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'example.urls'
@@ -115,6 +115,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'organizations.patch',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -122,7 +123,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'debug_toolbar',
     'organizations',
+    'south',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'organizations.backends.OrganizationBackend',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -147,3 +154,5 @@ LOGGING = {
         },
     }
 }
+
+DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False}
