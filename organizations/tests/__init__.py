@@ -1,16 +1,18 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
-from django.test import TestCase
+# import test models
+from .testmodels import TestModelDefaultAttribute, TestModelCustomAttribute, \
+        TestModelInvalidCustomAttribute, TestModelNoAttribute, \
+        TestModelInvalidFK
 
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+# import actual test cases
+from .models import OrganizationUserModelTest, OrganizationModelTest
+from .backends import PermissionTestCase
+
+# stop pyflakes from freaking out
+{
+    'testmodels': (TestModelDefaultAttribute, TestModelCustomAttribute,
+                   TestModelInvalidCustomAttribute, TestModelNoAttribute,
+                   TestModelInvalidFK),
+    'models': (OrganizationUserModelTest, OrganizationModelTest),
+    'backends': (PermissionTestCase,)
+}
