@@ -1,7 +1,16 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 
-{% block extrastyle %}{% load adminmedia %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/login.css" />{% endblock %}
+{% block extrastyle %}
+    {% load adminmedia %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/login.css" />
+    <style type='text/css'>
+        .login .form-row #id_organization {
+            width: 14em;
+        }
+    </style>
+{% endblock %}
 
 {% block bodyclass %}login{% endblock %}
 
@@ -48,7 +57,7 @@
 </form>
 
 <script type="text/javascript">
-document.getElementById('id_username').focus()
+document.getElementById('id_organization').focus()
 </script>
 </div>
 {% endblock %}
