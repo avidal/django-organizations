@@ -15,7 +15,7 @@ class Organization(models.Model):
     An organization is a top-level entity that describes a given organization.
     The code is the primary key and is used for login purposes.
     """
-    code = models.CharField(max_length=80, primary_key=True)
+    code = models.CharField(max_length=80, unique=True)
     name = models.CharField(max_length=80)
 
     def __unicode__(self):
