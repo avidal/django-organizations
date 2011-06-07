@@ -126,6 +126,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'organizations',
     'south',
+
+    'exampleapp',
 )
 
 AUTHENTICATION_BACKENDS = (
