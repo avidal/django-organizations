@@ -100,3 +100,32 @@ username to 80 characters instead of 30.
 The other patch that it performs is a patch of the login form for the admin, to
 add the organization field to the form. The updated template is provided in
 `organizations/patch/templates/admin/login.html`
+
+## Authentication Backend
+
+The authentication backend supports object permissions. There must be an
+attribute on each model that you want to support that is a FK to an
+`Organization` object. The default attribute name is `organization`, but it can
+be overridden with the `_ORGANIZATION_ATTRIBUTE` attribute on the model class:
+
+```python
+from django.db import models
+from organizations.models import Organization
+
+
+class MyModel(models.Model):
+    org = models.ForeignKey(Organization)
+    _ORGANIZATION_ATTRIBUTE = 'org'
+```
+
+User permissions are not supported. Instead, the user should be in a super role
+or a regular role for any given permission.
+
+The role-based permission checks go in phases:
+
+* If the user is a superuser, return every permission
+* If the user is in a SuperRole which grants a given permission, they have
+  access.
+* If the user is in the organization that the object is attached to, and they
+  are in a role for that organization that provides that permission, they have
+  access.
