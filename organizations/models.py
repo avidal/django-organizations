@@ -18,8 +18,14 @@ class Organization(models.Model):
     code = models.CharField(max_length=80, unique=True)
     name = models.CharField(max_length=80)
 
+    def all_members(self):
+        return self.primary_members.all() | self.members.all()
+
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        ordering = ['code']
 
 
 class SuperRole(models.Model):
