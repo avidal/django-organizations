@@ -37,8 +37,13 @@ class OrganizationBackend(ModelBackend):
         if perms is None:
             return set()
 
-        perms = perms.values_list('content_type__app_label',
-                                    'codename').order_by()
+        if isinstance(perms, (list, tuple)):
+            perms = [(perm.content_type.app_label, perm.codename)
+                     for perm in perms]
+
+        else:
+            perms = perms.values_list('content_type__app_label',
+                                        'codename').order_by()
 
         return set(['%s.%s' % (ct, name) for ct, name in perms])
 
@@ -84,7 +89,7 @@ class OrganizationBackend(ModelBackend):
         else:
             # Otherwise, the user is in the organization that owns the
             # object, so check role permissions
-            roles = user_obj.roles
+            roles = user_obj.roles.all()
             role_perms = Permission.objects.filter(role__in=roles)
             perms = perms | role_perms
 
