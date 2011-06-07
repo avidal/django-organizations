@@ -132,6 +132,7 @@ INSTALLED_APPS = (
 
 AUTHENTICATION_BACKENDS = (
     'organizations.backends.OrganizationBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 # A sample logging configuration. The only tangible logging
