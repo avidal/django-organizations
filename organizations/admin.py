@@ -26,6 +26,9 @@ class OrganizationUserChangeForm(UserChangeForm):
 
     def __init__(self, *args, **kwargs):
         super(OrganizationUserChangeForm, self).__init__(*args, **kwargs)
+
+        # only show roles that are a part of the organizations the user
+        # is attached to
         f = self.fields.get('roles', None)
         if f is not None:
             qs = f.queryset
@@ -34,6 +37,12 @@ class OrganizationUserChangeForm(UserChangeForm):
 
             qs = qs.filter(organization__in=orgs)
             f.queryset = qs
+
+        # remove the users current organization from the list of additional
+        # organizations
+        f = self.fields.get('organizations', None)
+        if f is not None:
+            f.queryset = f.queryset.exclude(code=self.instance.organization.code)
 
     class Meta:
         model = OrganizationUser
