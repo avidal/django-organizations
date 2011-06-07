@@ -9,6 +9,10 @@ class OrganizationBackend(ModelBackend):
     supports_object_permissions = True
 
     def authenticate(self, organization=None, username=None, password=None):
+
+        if organization is None:
+            return None
+
         try:
             organization = Organization.objects.get(code__iexact=organization)
         except Organization.DoesNotExist:
