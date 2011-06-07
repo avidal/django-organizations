@@ -105,6 +105,11 @@ class OrganizationUser(User):
 
     objects = OrganizationUserManager()
 
+    def get_all_organizations(self):
+        primary_org = Organization.objects.filter(primary_members=self)
+        orgs = self.organizations.all() | primary_org
+        return orgs
+
     @property
     def full_name(self):
         fn = '{0} {1}'.format(self.first_name, self.last_name)

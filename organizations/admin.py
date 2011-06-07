@@ -32,8 +32,7 @@ class OrganizationUserChangeForm(UserChangeForm):
         f = self.fields.get('roles', None)
         if f is not None:
             qs = f.queryset
-            orgs = list(self.instance.organizations.all())
-            orgs.append(self.instance.organization)
+            orgs = self.instance.get_all_organizations()
 
             qs = qs.filter(organization__in=orgs)
             f.queryset = qs
