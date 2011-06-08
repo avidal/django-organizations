@@ -5,6 +5,13 @@ user accounts. Each user is tied to one or more organizations and is a member
 of one or more roles per organization. Usernames must be unique within a given
 organization, and the login process adds a field for the name of the organization.
 
+## Warning
+
+This application performs some changes to the User model, as well as to the
+admin. There's no guarantee that it will work with any other applications you
+may be using. It was developed for an internal project at my office where we
+needed this support and it's working well for us in production.
+
 ## Installation
 
 Installation is simple. Install the application via whichever package manager
