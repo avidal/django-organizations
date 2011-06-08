@@ -93,9 +93,9 @@ class PermissionTestCase(TestCase):
         # add them to the role
         u.roles.add(role)
 
-        # make sure they do not have any permissions without an object
+        # make sure they have all permissions without an object
         for perm in self.permstr(perms):
-            self.assertFalse(self.backend.has_perm(u, perm))
+            self.assertTrue(self.backend.has_perm(u, perm))
 
         # ensure they have permissions if they are in the same organization
         class T(object):
@@ -172,8 +172,44 @@ class PermissionTestCase(TestCase):
 
         # ensure they do not have access to the new permission on other
         # objects
-        for obj in (None, T(), T2()):
-            self.assertFalse(self.backend.has_perm(u, new_permstr, obj=obj))
+        self.assertFalse(self.backend.has_perm(u, new_permstr, obj=T2()))
 
-        # ensure they have the new perm on the good object
-        self.assertTrue(self.backend.has_perm(u, new_permstr, obj=T1()))
+        # ensure they have the new perm on the good objects
+        for obj in (None, T(), T1()):
+            self.assertTrue(self.backend.has_perm(u, new_permstr, obj=obj))
+
+    def test_permissions_without_membership(self):
+        "Users with a permission for a different org should not have access"
+
+        role = Role.objects.create(organization=self.org, name='Role')
+
+        # assign a couple of permissions to the role
+        perms = list(Permission.objects.all()[0:2])
+        for perm in perms:
+            role.permissions.add(perm)
+
+        # create the actual user
+        u = OrganizationUser.objects.create_user(organization=self.org,
+                                                 username='testuser',
+                                                 email='test@test.com')
+
+        # add them to the role
+        u.roles.add(role)
+
+        org2 = Organization.objects.create(code='testorg2', name='Test Org2')
+
+        class T(object):
+            pass
+        class T1(object):
+            organization = self.org
+        class T2(object):
+            organization = org2
+
+        # the user should have the two permissions on None, T(), and T1()
+        for obj in (None, T(), T1()):
+            for perm in self.permstr(perms):
+                self.assertTrue(self.backend.has_perm(u, perm, obj=obj))
+
+        # the user should not have the permissions on T2()
+        for perm in self.permstr(perms):
+            self.assertFalse(self.backend.has_perm(u, perm, obj=T2()))
