@@ -56,9 +56,29 @@ class OrganizationBackend(ModelBackend):
         checking the object. A superuser immediately gets all of the available
         permissions, and a super role gets all of their super role permissions.
 
-        If an object is not supplied, the returned set contains all permissions
-        available to this user. This facilitates things like hiding/showing
-        features based on whether or not a user has a permission available.
+        The supplied object can be None, an `Organization` object,
+        or an object with an organization attribute.
+
+        If the object is None, then this function returns all permissions that
+        this user has available, regardless of object. This facilitates
+        situations where you want to limit functionality based off of whether or
+        not a permission exists at all.
+
+        If the object is an `Organization` object, we only return permissions
+        granted via SuperRoles and Roles the user is a member of, that are part
+        of the supplied organization.
+
+        If the supplied object has an `organization` attribute (or an
+        _ORGANIZATION_ATTRIBUTE attribute with the name of an actual attribute
+        that returns an `Organization` object), then the returned permissions
+        are all permissions granted via SuperRoles, as well as permissions
+        granted from Roles that the user is a member of, that are part of the
+        organization that owns the object.
+
+        Finally, if an object is supplied, but it is not an `Organization`
+        object, nor does it have an attribute that points to an `Organization`
+        object, then return all available permissions (as if the supplied object
+        was None)
         """
 
         # superusers get all permissions, like usual
@@ -81,25 +101,30 @@ class OrganizationBackend(ModelBackend):
 
         # next, get the set of permissions provided by the regular roles
 
-        # check the object's organization
-        attname = getattr(obj, '_ORGANIZATION_ATTRIBUTE', 'organization')
+        if isinstance(obj, Organization):
+            # if the supplied object is an `Organization` object
+            object_org = obj
+        else:
+            # check the object's organization
+            attname = getattr(obj, '_ORGANIZATION_ATTRIBUTE', 'organization')
 
-        # if no object was passed in, or the object doesn't have an
-        # organization attribute, include all permissions from all roles
-        if obj is None or not hasattr(obj, attname):
-            roles = user_obj.roles.all()
-            perms = perms | Permission.objects.filter(role__in=roles)
+            # if no object was passed in, or the object doesn't have an
+            # organization attribute, include all permissions from all roles
+            if obj is None or not hasattr(obj, attname):
+                roles = user_obj.roles.all()
+                perms = perms | Permission.objects.filter(role__in=roles)
 
-            # done calculating at this point, return early
-            return self._create_permission_set(perms)
+                # done calculating at this point, return early
+                return self._create_permission_set(perms)
 
-        # At this point, we know the object is not None and the object
-        # has an organization attribute, so fetch the value of the organization
-        obj_org = getattr(obj, attname, None)
+            # At this point, we know the object is not None and the object
+            # has an organization attribute, so fetch the value of the
+            # organization
+            object_org = getattr(obj, attname, None)
 
         # If the value of the organization attribute is None, then return
         # the currently collected permissions
-        if obj_org is None:
+        if object_org is None:
             return self._create_permission_set(perms)
 
         # Finally, collect the permissions this user has on this object, based
@@ -107,12 +132,12 @@ class OrganizationBackend(ModelBackend):
 
         # If the user is not a member of the organization attached to this
         # object, then return the collected permissions
-        if obj_org not in user_obj.get_all_organizations():
+        if object_org not in user_obj.get_all_organizations():
             return self._create_permission_set(perms)
 
         # The user is in the organization that owns this object, so collect
         # all of the permissions this user has for this organization
-        roles = user_obj.roles.filter(organization=obj_org)
+        roles = user_obj.roles.filter(organization=object_org)
         perms = perms | Permission.objects.filter(role__in=roles)
 
         return self._create_permission_set(perms)

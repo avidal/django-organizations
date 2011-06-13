@@ -133,6 +133,10 @@ The role-based permission checks go in phases:
 * If the user is a superuser, return every permission
 * If the user is in a SuperRole which grants a given permission, they have
   access.
+* If the supplied object is an Organization, then it is equivalent to below,
+  where they have that permission if they are a member of the organization
+  supplied, and they are in a Role that provides that permission through that
+  organization.
 * If the user is in the organization that the object is attached to, and they
   are in a role for that organization that provides that permission, they have
   access.

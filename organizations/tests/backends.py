@@ -213,3 +213,32 @@ class PermissionTestCase(TestCase):
         # the user should not have the permissions on T2()
         for perm in self.permstr(perms):
             self.assertFalse(self.backend.has_perm(u, perm, obj=T2()))
+
+    def test_permissions_with_org_supplied(self):
+        "Supplying an Organization instead of an object should work."
+
+        role = Role.objects.create(organization=self.org, name='Role')
+
+        # assign a couple of permissions to the role
+        perms = list(Permission.objects.all()[0:2])
+        for perm in perms:
+            role.permissions.add(perm)
+
+        # create the actual user
+        u = OrganizationUser.objects.create_user(organization=self.org,
+                                                 username='testuser',
+                                                 email='test@test.com')
+
+        # add them to the role
+        u.roles.add(role)
+
+        org2 = Organization.objects.create(code='testorg2', name='Test Org2')
+
+        # the user should have all permissions from above for their organization
+        for perm in self.permstr(perms):
+            self.assertTrue(self.backend.has_perm(u, perm, u.organization))
+
+        # likewise, the user should NOT have the permissions if the passed
+        # org is not the org they are a part of
+        for perm in self.permstr(perms):
+            self.assertFalse(self.backend.has_perm(u, perm, org2))
