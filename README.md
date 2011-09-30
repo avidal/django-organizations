@@ -1,3 +1,5 @@
+**This project is dead for the time being and is nowhere near ready to be used in production.**
+
 # django-organizations
 
 This project aims to provide a solution for projects that require more flexible
